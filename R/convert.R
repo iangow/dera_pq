@@ -12,11 +12,29 @@ download_zip <- function(url, user_agent = NULL, quiet = FALSE) {
   dest
 }
 
-read_zip_table <- function(zip_file, spec) {
-  df <- readr::read_tsv(
-    unz(zip_file, spec$source),
-    col_types = spec$col_types,
-    progress = FALSE
+read_zip_table <- function(zip_file, spec, source_file = basename(zip_file),
+                           table = spec$source) {
+  parsing_warning <- FALSE
+  df <- withCallingHandlers(
+    readr::read_tsv(
+      unz(zip_file, spec$source),
+      col_types = spec$col_types,
+      progress = FALSE
+    ),
+    warning = function(cnd) {
+      if (grepl("One or more parsing issues", conditionMessage(cnd), fixed = TRUE)) {
+        parsing_warning <<- TRUE
+        rlang::cnd_muffle(cnd)
+      }
+    }
+  )
+
+  .warn_parsing_problems(
+    df = df,
+    source_file = source_file,
+    table = table,
+    source = spec$source,
+    parsing_warning = parsing_warning
   )
 
   for (col in spec$date_cols) {
@@ -27,6 +45,48 @@ read_zip_table <- function(zip_file, spec) {
   }
 
   df
+}
+
+.warn_parsing_problems <- function(df, source_file, table, source,
+                                   parsing_warning = FALSE) {
+  problems <- readr::problems(df)
+  if (!isTRUE(parsing_warning) && nrow(problems) == 0) {
+    return(invisible(problems))
+  }
+
+  details <- .format_parsing_problems(problems)
+  warning(
+    paste0(
+      "Parsing issues in SEC source file '", source_file, "', table '", table,
+      "' (", source, "): ", nrow(problems), " issue(s).",
+      details
+    ),
+    call. = FALSE
+  )
+  invisible(problems)
+}
+
+.format_parsing_problems <- function(problems, n = 5) {
+  if (nrow(problems) == 0) {
+    return("")
+  }
+
+  shown <- utils::head(problems, n)
+  lines <- purrr::pmap_chr(shown, function(row, col, expected, actual, file, ...) {
+    paste0(
+      "\n  row ", row,
+      ", col ", col,
+      ": expected ", expected,
+      ", actual ", actual
+    )
+  })
+
+  more <- nrow(problems) - length(lines)
+  if (more > 0) {
+    lines <- c(lines, paste0("\n  ... and ", more, " more issue(s)"))
+  }
+
+  paste0(lines, collapse = "")
 }
 
 write_table_parquet <- function(df, table, period, pq_dir, metadata) {
@@ -64,7 +124,12 @@ update_dataset_file <- function(file, dataset, data_dir = NULL,
   )
 
   out <- purrr::imap_chr(cfg$table_specs, function(spec, table) {
-    df <- read_zip_table(zip_file, spec)
+    df <- read_zip_table(
+      zip_file,
+      spec,
+      source_file = file,
+      table = table
+    )
     write_table_parquet(df, table, period, pq_dir, metadata = metadata)
   })
 
