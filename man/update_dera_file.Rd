@@ -4,7 +4,13 @@
 \alias{update_dera_file}
 \title{Update one SEC DERA Financial Statement Data Set source file}
 \usage{
-update_dera_file(file, data_dir = NULL, user_agent = NULL, quiet = FALSE)
+update_dera_file(
+  file,
+  data_dir = NULL,
+  user_agent = NULL,
+  quiet = FALSE,
+  cache = TRUE
+)
 }
 \arguments{
 \item{file}{Zip file name from the SEC DERA page, such as \code{"2024q1.zip"}.}
@@ -15,6 +21,11 @@ update_dera_file(file, data_dir = NULL, user_agent = NULL, quiet = FALSE)
 using \code{dera_user_agent()}.}
 
 \item{quiet}{If \code{TRUE}, suppress progress messages.}
+
+\item{cache}{If \code{TRUE}, cache downloaded zip files under
+\code{tools::R_user_dir("dera.pq", "cache")}. If a string, use that directory
+as the zip cache. If \code{FALSE}, download to a temporary file and delete it
+after processing.}
 }
 \value{
 A tibble describing the Parquet files written.

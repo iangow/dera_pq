@@ -1,6 +1,17 @@
-download_zip <- function(url, user_agent = NULL, quiet = FALSE) {
+download_zip <- function(url, user_agent = NULL, quiet = FALSE,
+                         cache_file = NULL) {
   user_agent <- dera_user_agent(user_agent)
-  dest <- tempfile(fileext = ".zip")
+  dest <- cache_file %||% tempfile(fileext = ".zip")
+  if (!is.null(cache_file) && .valid_zip_file(cache_file)) {
+    if (!quiet) {
+      message("Using cached ", cache_file)
+    }
+    return(cache_file)
+  }
+
+  if (!is.null(cache_file)) {
+    dir.create(dirname(cache_file), recursive = TRUE, showWarnings = FALSE)
+  }
 
   req <- httr2::request(url) |>
     httr2::req_user_agent(user_agent)
@@ -10,6 +21,26 @@ download_zip <- function(url, user_agent = NULL, quiet = FALSE) {
     message("Downloaded ", url)
   }
   dest
+}
+
+.valid_zip_file <- function(path) {
+  file.exists(path) &&
+    isTRUE(file.info(path)$size > 0) &&
+    !inherits(try(utils::unzip(path, list = TRUE), silent = TRUE), "try-error")
+}
+
+.zip_cache_file <- function(file, cfg, data_dir = NULL, cache = TRUE) {
+  if (isFALSE(cache) || is.null(cache)) {
+    return(NULL)
+  }
+
+  cache_dir <- if (isTRUE(cache)) {
+    file.path(tools::R_user_dir("dera.pq", "cache"), cfg$schema)
+  } else {
+    path.expand(cache)
+  }
+
+  file.path(cache_dir, basename(file))
 }
 
 read_zip_table <- function(zip_file, spec, source_file = basename(zip_file),
@@ -115,7 +146,7 @@ write_table_parquet <- function(df, table, period, pq_dir, metadata) {
 
 update_dataset_file <- function(file, dataset, data_dir = NULL,
                                 user_agent = NULL, last_modified = NULL,
-                                quiet = FALSE) {
+                                quiet = FALSE, cache = TRUE) {
   cfg <- dera_datasets(dataset)
   data_dir <- dera_data_dir(data_dir)
   user_agent <- dera_user_agent(user_agent)
@@ -126,9 +157,12 @@ update_dataset_file <- function(file, dataset, data_dir = NULL,
   zip_file <- download_zip(
     source_url,
     user_agent = user_agent,
-    quiet = quiet
+    quiet = quiet,
+    cache_file = .zip_cache_file(file, cfg, data_dir, cache = cache)
   )
-  on.exit(unlink(zip_file), add = TRUE)
+  if (isFALSE(cache) || is.null(cache)) {
+    on.exit(unlink(zip_file), add = TRUE)
+  }
 
   period <- cfg$period(file)
   pq_dir <- file.path(data_dir, cfg$schema)
@@ -174,18 +208,24 @@ update_dataset_file <- function(file, dataset, data_dir = NULL,
 #' @param user_agent Optional SEC-compliant user agent. If omitted, resolved
 #'   using `dera_user_agent()`.
 #' @param quiet If `TRUE`, suppress progress messages.
+#' @param cache If `TRUE`, cache downloaded zip files under
+#'   `tools::R_user_dir("dera.pq", "cache")`. If a string, use that directory
+#'   as the zip cache. If `FALSE`, download to a temporary file and delete it
+#'   after processing.
 #'
 #' @return A tibble describing the Parquet files written.
 #' @export
 update_dera_file <- function(file, data_dir = NULL,
                              user_agent = NULL,
-                             quiet = FALSE) {
+                             quiet = FALSE,
+                             cache = TRUE) {
   update_dataset_file(
     file = file,
     dataset = "dera",
     data_dir = data_dir,
     user_agent = user_agent,
-    quiet = quiet
+    quiet = quiet,
+    cache = cache
   )
 }
 
@@ -200,12 +240,14 @@ update_dera_file <- function(file, data_dir = NULL,
 #' @export
 update_dera_notes_file <- function(file, data_dir = NULL,
                                    user_agent = NULL,
-                                   quiet = FALSE) {
+                                   quiet = FALSE,
+                                   cache = TRUE) {
   update_dataset_file(
     file = file,
     dataset = "dera_notes",
     data_dir = data_dir,
     user_agent = user_agent,
-    quiet = quiet
+    quiet = quiet,
+    cache = cache
   )
 }

@@ -129,3 +129,31 @@ test_that("parse problem metadata is available for parquet writes", {
     "2"
   )
 })
+
+test_that("zip cache path defaults under user cache directory and schema", {
+  cfg <- dera_datasets("dera_notes")
+
+  expect_equal(
+    .zip_cache_file("2024q1_notes.zip", cfg, "/tmp/data", cache = TRUE),
+    file.path(
+      tools::R_user_dir("dera.pq", "cache"),
+      "dera_notes",
+      "2024q1_notes.zip"
+    )
+  )
+  expect_null(.zip_cache_file("2024q1_notes.zip", cfg, "/tmp/data", cache = FALSE))
+  expect_equal(
+    .zip_cache_file("2024q1_notes.zip", cfg, "/tmp/data", cache = "/tmp/cache"),
+    file.path("/tmp/cache", "2024q1_notes.zip")
+  )
+})
+
+test_that("valid zip cache detection rejects missing and invalid files", {
+  missing <- tempfile(fileext = ".zip")
+  invalid <- tempfile(fileext = ".zip")
+  writeLines("not a zip", invalid)
+  on.exit(unlink(invalid), add = TRUE)
+
+  expect_false(.valid_zip_file(missing))
+  expect_false(.valid_zip_file(invalid))
+})

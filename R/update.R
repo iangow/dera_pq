@@ -1,6 +1,7 @@
 update_dataset <- function(dataset, data_dir = NULL,
                            user_agent = NULL,
-                           archive_orphans = FALSE, quiet = FALSE) {
+                           archive_orphans = FALSE, quiet = FALSE,
+                           cache = TRUE) {
   cfg <- dera_datasets(dataset)
   data_dir <- dera_data_dir(data_dir)
   user_agent <- dera_user_agent(user_agent)
@@ -24,7 +25,8 @@ update_dataset <- function(dataset, data_dir = NULL,
           data_dir = data_dir,
           user_agent = user_agent,
           last_modified = last_modified,
-          quiet = quiet
+          quiet = quiet,
+          cache = cache
         )
       }
     )
@@ -47,18 +49,24 @@ update_dataset <- function(dataset, data_dir = NULL,
 #' @param user_agent Optional SEC-compliant user agent. If omitted, resolved
 #'   using `dera_user_agent()`.
 #' @param quiet If `TRUE`, suppress progress messages.
+#' @param cache If `TRUE`, cache downloaded zip files under
+#'   `tools::R_user_dir("dera.pq", "cache")`. If a string, use that directory
+#'   as the zip cache. If `FALSE`, download to a temporary file and delete it
+#'   after processing.
 #'
 #' @return Invisibly, a tibble of source zip files that were updated.
 #' @export
 update_dera <- function(data_dir = NULL,
                         user_agent = NULL,
-                        quiet = FALSE) {
+                        quiet = FALSE,
+                        cache = TRUE) {
   update_dataset(
     dataset = "dera",
     data_dir = data_dir,
     user_agent = user_agent,
     archive_orphans = FALSE,
-    quiet = quiet
+    quiet = quiet,
+    cache = cache
   )
 }
 
@@ -76,13 +84,15 @@ update_dera <- function(data_dir = NULL,
 update_dera_notes <- function(data_dir = NULL,
                               user_agent = NULL,
                               archive_orphans = TRUE,
-                              quiet = FALSE) {
+                              quiet = FALSE,
+                              cache = TRUE) {
   update_dataset(
     dataset = "dera_notes",
     data_dir = data_dir,
     user_agent = user_agent,
     archive_orphans = archive_orphans,
-    quiet = quiet
+    quiet = quiet,
+    cache = cache
   )
 }
 

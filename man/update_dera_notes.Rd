@@ -8,7 +8,8 @@ update_dera_notes(
   data_dir = NULL,
   user_agent = NULL,
   archive_orphans = TRUE,
-  quiet = FALSE
+  quiet = FALSE,
+  cache = TRUE
 )
 }
 \arguments{
@@ -22,6 +23,11 @@ using \code{dera_user_agent()}.}
 listed by the SEC into \verb{$DATA_DIR/dera_notes/archive}.}
 
 \item{quiet}{If \code{TRUE}, suppress progress messages.}
+
+\item{cache}{If \code{TRUE}, cache downloaded zip files under
+\code{tools::R_user_dir("dera.pq", "cache")}. If a string, use that directory
+as the zip cache. If \code{FALSE}, download to a temporary file and delete it
+after processing.}
 }
 \value{
 Invisibly, a tibble of source zip files that were updated.

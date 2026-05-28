@@ -4,7 +4,7 @@
 \alias{update_dera}
 \title{Update SEC DERA Financial Statement Data Set Parquet files}
 \usage{
-update_dera(data_dir = NULL, user_agent = NULL, quiet = FALSE)
+update_dera(data_dir = NULL, user_agent = NULL, quiet = FALSE, cache = TRUE)
 }
 \arguments{
 \item{data_dir}{Root of the local Parquet repository. If omitted, resolved
@@ -14,6 +14,11 @@ using \code{dera_data_dir()}.}
 using \code{dera_user_agent()}.}
 
 \item{quiet}{If \code{TRUE}, suppress progress messages.}
+
+\item{cache}{If \code{TRUE}, cache downloaded zip files under
+\code{tools::R_user_dir("dera.pq", "cache")}. If a string, use that directory
+as the zip cache. If \code{FALSE}, download to a temporary file and delete it
+after processing.}
 }
 \value{
 Invisibly, a tibble of source zip files that were updated.
