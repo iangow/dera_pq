@@ -18,4 +18,7 @@ A non-empty character string containing an email address.
 \description{
 Resolves the SEC user agent from, in order, an explicit argument, the
 \code{SEC_USER_AGENT} environment variable, and \code{getOption("HTTPUserAgent")}.
+In an interactive session, when no valid value can be resolved, the helper
+asks for a user agent and offers to persist it in either project-level
+\code{.Renviron} or user-level \verb{~/.Renviron}.
 }

@@ -10,9 +10,13 @@ The package is based on the scripts `get_dera.R` and `get_dera_notes.R` from
 ## Setup
 
 ```r
-options(HTTPUserAgent = "your_name@email.com")
-Sys.setenv(DATA_DIR = "/path/to/parquet/data")
+dera_set_user_agent("your_name@email.com")
+dera_data_dir()
 ```
+
+In interactive sessions, `dera.pq` prompts for missing configuration and offers
+to store `SEC_USER_AGENT` and `DATA_DIR` in either project-level `.Renviron` or
+user-level `~/.Renviron`.
 
 ## Usage
 

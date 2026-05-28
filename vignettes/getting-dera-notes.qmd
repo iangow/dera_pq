@@ -28,7 +28,9 @@ file rather than in a separate sidecar table.
 SEC automated-access guidance asks users to provide a descriptive user agent
 that includes contact information. `dera.pq` resolves this value from an
 explicit argument, the `SEC_USER_AGENT` environment variable, or
-`getOption("HTTPUserAgent")`.
+`getOption("HTTPUserAgent")`. In an interactive session, if no valid value can
+be resolved, the package asks for one and offers to store it in project-level
+`.Renviron` or user-level `~/.Renviron`.
 
 ```{r}
 #| eval: false
