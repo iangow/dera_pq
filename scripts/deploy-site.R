@@ -16,5 +16,6 @@ pkgdown::deploy_to_branch(
   remote = "origin",
   clean = TRUE,
   github_pages = TRUE,
+  install = TRUE,
   new_process = FALSE
 )
