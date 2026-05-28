@@ -1,0 +1,15 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rcheck/
+*.tar.gz
+*.tgz
+.DS_Store
+docs/
+Meta/
+doc/
+vignettes/.quarto/
+vignettes/*_files/
+.httr-oauth
+.quarto

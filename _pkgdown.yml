@@ -1,0 +1,43 @@
+url: https://iangow.github.io/dera_pq/
+
+template:
+  bootstrap: 5
+
+navbar:
+  structure:
+    left: [intro, reference, articles]
+    right: [github]
+
+reference:
+  - title: Source file metadata
+    desc: >
+      Functions for listing SEC DERA source files and their Last-Modified
+      metadata.
+    contents:
+      - available_dera
+      - available_dera_notes
+      - available_dera_files
+  - title: Update Parquet repositories
+    desc: >
+      High-level functions that update all current SEC DERA source files.
+    contents:
+      - update_dera
+      - update_dera_notes
+  - title: Update one source file
+    desc: >
+      Lower-level functions used by the repository updaters.
+    contents:
+      - update_dera_file
+      - update_dera_notes_file
+  - title: Configuration and metadata
+    contents:
+      - dera_data_dir
+      - dera_user_agent
+      - dera_set_user_agent
+      - dera_file_metadata
+
+articles:
+  - title: Workflows
+    navbar: Workflows
+    contents:
+      - getting-dera-notes

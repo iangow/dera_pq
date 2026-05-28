@@ -1,0 +1,10 @@
+^\\.gitignore$
+^\\.Rbuildignore$
+^\\.Rproj\\.user$
+^.*\\.Rproj$
+^docs$
+^Meta$
+^doc$
+^vignettes$
+^vignettes/\\.quarto$
+^vignettes/.*_files$

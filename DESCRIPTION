@@ -1,0 +1,40 @@
+Package: dera.pq
+Title: SEC DERA Data Sets as Local Parquet Files
+Version: 0.0.0.9000
+Authors@R:
+    person("Ian D.", "Gow", email = "iandgow@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-6243-8409"))
+Author: Ian D. Gow [aut, cre] (ORCID:
+    <https://orcid.org/0000-0002-6243-8409>)
+Maintainer: Ian D. Gow <iandgow@gmail.com>
+Description: Downloads SEC DERA Financial Statement Data Sets and Financial
+    Statement and Notes Data Sets, converts the tab-delimited files in each zip
+    archive to Parquet, and maintains update metadata in a local DATA_DIR-style
+    data repository.
+License: MIT + file LICENSE
+URL: https://iangow.github.io/dera_pq/
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Depends:
+    R (>= 4.1)
+Imports:
+    arrow,
+    dplyr,
+    httr2,
+    lubridate,
+    purrr,
+    readr,
+    rlang,
+    rvest,
+    stringr,
+    tibble
+Suggests:
+    knitr,
+    pkgdown,
+    quarto,
+    rmarkdown,
+    rstudioapi,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Config/Needs/website: pkgdown, quarto
+Config/roxygen2/version: 8.0.0
