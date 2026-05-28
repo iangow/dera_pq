@@ -1,12 +1,17 @@
 download_zip <- function(url, user_agent = NULL, quiet = FALSE,
-                         cache_file = NULL) {
+                         cache_file = NULL, last_modified = NULL) {
   user_agent <- dera_user_agent(user_agent)
   dest <- cache_file %||% tempfile(fileext = ".zip")
   if (!is.null(cache_file) && .valid_zip_file(cache_file)) {
-    if (!quiet) {
-      message("Using cached ", cache_file)
+    if (.zip_cache_metadata_matches(cache_file, last_modified)) {
+      if (!quiet) {
+        message("Using cached ", cache_file)
+      }
+      return(cache_file)
     }
-    return(cache_file)
+    if (!quiet) {
+      message("Cached zip is stale; downloading ", url)
+    }
   }
 
   if (!is.null(cache_file)) {
@@ -17,6 +22,9 @@ download_zip <- function(url, user_agent = NULL, quiet = FALSE,
     httr2::req_user_agent(user_agent)
 
   httr2::req_perform(req, path = dest)
+  if (!is.null(cache_file)) {
+    .write_zip_cache_metadata(cache_file, url, last_modified)
+  }
   if (!quiet) {
     message("Downloaded ", url)
   }
@@ -41,6 +49,53 @@ download_zip <- function(url, user_agent = NULL, quiet = FALSE,
   }
 
   file.path(cache_dir, basename(file))
+}
+
+.zip_cache_metadata_file <- function(cache_file) {
+  paste0(cache_file, ".dcf")
+}
+
+.read_zip_cache_metadata <- function(cache_file) {
+  metadata_file <- .zip_cache_metadata_file(cache_file)
+  if (!file.exists(metadata_file)) {
+    return(NULL)
+  }
+
+  metadata <- tryCatch(
+    as.list(read.dcf(metadata_file)[1, ]),
+    error = function(e) NULL
+  )
+  if (is.null(metadata)) {
+    return(NULL)
+  }
+  metadata
+}
+
+.write_zip_cache_metadata <- function(cache_file, url, last_modified = NULL) {
+  metadata_file <- .zip_cache_metadata_file(cache_file)
+  dir.create(dirname(metadata_file), recursive = TRUE, showWarnings = FALSE)
+  metadata <- list(
+    URL = url,
+    "Last-Modified" = last_modified %||% "",
+    "Last-Modified-UTC" = http_datetime_iso(last_modified),
+    "Downloaded-At-UTC" = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+  )
+  write.dcf(as.data.frame(metadata, check.names = FALSE), metadata_file)
+  invisible(metadata_file)
+}
+
+.zip_cache_metadata_matches <- function(cache_file, last_modified = NULL) {
+  if (is.null(last_modified) || !nzchar(last_modified)) {
+    return(TRUE)
+  }
+
+  metadata <- .read_zip_cache_metadata(cache_file)
+  if (is.null(metadata)) {
+    return(FALSE)
+  }
+
+  cached_modified <- metadata[["Last-Modified"]] %||% ""
+  nzchar(cached_modified) && http_datetime_equal(cached_modified, last_modified)
 }
 
 read_zip_table <- function(zip_file, spec, source_file = basename(zip_file),
@@ -158,7 +213,8 @@ update_dataset_file <- function(file, dataset, data_dir = NULL,
     source_url,
     user_agent = user_agent,
     quiet = quiet,
-    cache_file = .zip_cache_file(file, cfg, data_dir, cache = cache)
+    cache_file = .zip_cache_file(file, cfg, data_dir, cache = cache),
+    last_modified = last_modified
   )
   if (isFALSE(cache) || is.null(cache)) {
     on.exit(unlink(zip_file), add = TRUE)
