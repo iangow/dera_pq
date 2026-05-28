@@ -1,20 +1,21 @@
 update_dataset <- function(dataset, data_dir = NULL,
                            user_agent = NULL,
                            archive_orphans = FALSE, quiet = FALSE,
-                           cache = TRUE) {
+                           cache = TRUE, force = FALSE) {
   cfg <- dera_datasets(dataset)
   data_dir <- dera_data_dir(data_dir)
   user_agent <- dera_user_agent(user_agent)
 
   available <- available_dera_files(cfg$dataset, user_agent = user_agent)
-  current <- local_source_metadata(available, cfg, data_dir)
-  todo <- files_to_update(available, current)
+  current <- if (isTRUE(force)) NULL else local_source_metadata(available, cfg, data_dir)
+  todo <- files_to_process(available, current, force = force)
 
   if (nrow(todo) == 0) {
     if (!quiet) message("No updates needed for ", cfg$dataset, ".")
   } else {
     if (!quiet) {
-      message("Updating ", nrow(todo), " ", cfg$dataset, " zip file(s).")
+      action <- if (isTRUE(force)) "Reprocessing " else "Updating "
+      message(action, nrow(todo), " ", cfg$dataset, " zip file(s).")
     }
     purrr::pwalk(
       todo,
@@ -39,6 +40,13 @@ update_dataset <- function(dataset, data_dir = NULL,
   invisible(todo)
 }
 
+files_to_process <- function(available, current = NULL, force = FALSE) {
+  if (isTRUE(force)) {
+    return(available)
+  }
+  files_to_update(available, current)
+}
+
 #' Update SEC DERA Financial Statement Data Set Parquet files
 #'
 #' Downloads new or changed SEC DERA Financial Statement Data Set zip files and
@@ -53,20 +61,24 @@ update_dataset <- function(dataset, data_dir = NULL,
 #'   `tools::R_user_dir("dera.pq", "cache")`. If a string, use that directory
 #'   as the zip cache. If `FALSE`, download to a temporary file and delete it
 #'   after processing.
+#' @param force If `TRUE`, reprocess all SEC source zip files listed by the SEC
+#'   even when the local Parquet files already appear current.
 #'
 #' @return Invisibly, a tibble of source zip files that were updated.
 #' @export
 update_dera <- function(data_dir = NULL,
                         user_agent = NULL,
                         quiet = FALSE,
-                        cache = TRUE) {
+                        cache = TRUE,
+                        force = FALSE) {
   update_dataset(
     dataset = "dera",
     data_dir = data_dir,
     user_agent = user_agent,
     archive_orphans = FALSE,
     quiet = quiet,
-    cache = cache
+    cache = cache,
+    force = force
   )
 }
 
@@ -85,14 +97,16 @@ update_dera_notes <- function(data_dir = NULL,
                               user_agent = NULL,
                               archive_orphans = TRUE,
                               quiet = FALSE,
-                              cache = TRUE) {
+                              cache = TRUE,
+                              force = FALSE) {
   update_dataset(
     dataset = "dera_notes",
     data_dir = data_dir,
     user_agent = user_agent,
     archive_orphans = archive_orphans,
     quiet = quiet,
-    cache = cache
+    cache = cache,
+    force = force
   )
 }
 

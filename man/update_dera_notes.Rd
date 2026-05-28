@@ -9,7 +9,8 @@ update_dera_notes(
   user_agent = NULL,
   archive_orphans = TRUE,
   quiet = FALSE,
-  cache = TRUE
+  cache = TRUE,
+  force = FALSE
 )
 }
 \arguments{
@@ -28,6 +29,9 @@ listed by the SEC into \verb{$DATA_DIR/dera_notes/archive}.}
 \code{tools::R_user_dir("dera.pq", "cache")}. If a string, use that directory
 as the zip cache. If \code{FALSE}, download to a temporary file and delete it
 after processing.}
+
+\item{force}{If \code{TRUE}, reprocess all SEC source zip files listed by the SEC
+even when the local Parquet files already appear current.}
 }
 \value{
 Invisibly, a tibble of source zip files that were updated.
