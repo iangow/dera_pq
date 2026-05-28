@@ -86,7 +86,8 @@ dera_notes_table_specs <- function() {
     ),
     ren_notes = table_spec(
       source = "ren.tsv",
-      col_types = "cdccccccdd"
+      col_types = "cdccccccdd",
+      quote = ""
     ),
     pre_notes = table_spec(
       source = "pre.tsv",
@@ -100,11 +101,12 @@ dera_notes_table_specs <- function() {
 }
 
 table_spec <- function(source, col_types, date_cols = character(),
-                       datetime_cols = character()) {
+                       datetime_cols = character(), quote = "\"") {
   list(
     source = source,
     col_types = col_types,
     date_cols = date_cols,
-    datetime_cols = datetime_cols
+    datetime_cols = datetime_cols,
+    quote = quote
   )
 }

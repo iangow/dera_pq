@@ -19,7 +19,8 @@ read_zip_table <- function(zip_file, spec, source_file = basename(zip_file),
     readr::read_tsv(
       unz(zip_file, spec$source),
       col_types = spec$col_types,
-      progress = FALSE
+      progress = FALSE,
+      quote = spec$quote %||% "\""
     ),
     warning = function(cnd) {
       if (grepl("One or more parsing issues", conditionMessage(cnd), fixed = TRUE)) {
@@ -29,13 +30,14 @@ read_zip_table <- function(zip_file, spec, source_file = basename(zip_file),
     }
   )
 
-  .warn_parsing_problems(
+  problems <- .warn_parsing_problems(
     df = df,
     source_file = source_file,
     table = table,
     source = spec$source,
     parsing_warning = parsing_warning
   )
+  attr(df, "dera_parse_problems") <- problems
 
   for (col in spec$date_cols) {
     df[[col]] <- lubridate::ymd(df[[col]])
@@ -45,6 +47,20 @@ read_zip_table <- function(zip_file, spec, source_file = basename(zip_file),
   }
 
   df
+}
+
+.parsing_metadata <- function(df, table, source) {
+  problems <- attr(df, "dera_parse_problems")
+  if (is.null(problems)) {
+    problems <- readr::problems(df)
+  }
+
+  list(
+    dera_source_table = table,
+    dera_source_inner_file = source,
+    dera_parse_problem_count = as.character(nrow(problems)),
+    dera_parse_problem_rows = paste(utils::head(problems$row, 50), collapse = ",")
+  )
 }
 
 .warn_parsing_problems <- function(df, source_file, table, source,
@@ -130,7 +146,13 @@ update_dataset_file <- function(file, dataset, data_dir = NULL,
       source_file = file,
       table = table
     )
-    write_table_parquet(df, table, period, pq_dir, metadata = metadata)
+    write_table_parquet(
+      df,
+      table,
+      period,
+      pq_dir,
+      metadata = c(metadata, .parsing_metadata(df, table, spec$source))
+    )
   })
 
   tibble::tibble(
