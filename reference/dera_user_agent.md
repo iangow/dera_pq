@@ -2,6 +2,9 @@
 
 Resolves the SEC user agent from, in order, an explicit argument, the
 `SEC_USER_AGENT` environment variable, and `getOption("HTTPUserAgent")`.
+In an interactive session, when no valid value can be resolved, the
+helper asks for a user agent and offers to persist it in either
+project-level `.Renviron` or user-level `~/.Renviron`.
 
 ## Usage
 

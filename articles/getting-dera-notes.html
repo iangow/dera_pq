@@ -72,7 +72,7 @@
 <p>The <code>dera.pq</code> package downloads those zip files and writes their component tables as Parquet files in a local <code>DATA_DIR</code> repository. It is based on the workflow originally described in Ian Gow’s note “Getting SEC EDGAR XBRL data,” but packages the update logic and stores source-file metadata in each Parquet file rather than in a separate sidecar table.</p>
 <section class="level2"><h2 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
 </h2>
-<p>SEC automated-access guidance asks users to provide a descriptive user agent that includes contact information. <code>dera.pq</code> resolves this value from an explicit argument, the <code>SEC_USER_AGENT</code> environment variable, or <code>getOption("HTTPUserAgent")</code>.</p>
+<p>SEC automated-access guidance asks users to provide a descriptive user agent that includes contact information. <code>dera.pq</code> resolves this value from an explicit argument, the <code>SEC_USER_AGENT</code> environment variable, or <code>getOption("HTTPUserAgent")</code>. In an interactive session, if no valid value can be resolved, the package asks for one and offers to store it in project-level <code>.Renviron</code> or user-level <code>~/.Renviron</code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://iangow.github.io/dera_pq/">dera.pq</a></span><span class="op">)</span></span>

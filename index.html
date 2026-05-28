@@ -57,8 +57,9 @@
 <h2 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>HTTPUserAgent <span class="op">=</span> <span class="st">"your_name@email.com"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>DATA_DIR <span class="op">=</span> <span class="st">"/path/to/parquet/data"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/dera_set_user_agent.html">dera_set_user_agent</a></span><span class="op">(</span><span class="st">"your_name@email.com"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/dera_data_dir.html">dera_data_dir</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>In interactive sessions, <code>dera.pq</code> prompts for missing configuration and offers to store <code>SEC_USER_AGENT</code> and <code>DATA_DIR</code> in either project-level <code>.Renviron</code> or user-level <code>~/.Renviron</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
