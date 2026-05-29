@@ -150,14 +150,17 @@ wildcard-like file listing:
 
 ``` r
 
-library(arrow)
-dplyr::open_dataset(
-  list.files(
-    file.path(Sys.getenv("DATA_DIR"), "dera_notes"),
-    pattern = "^sub_notes_.*\\.parquet$",
-    full.names = TRUE
-  )
-)
+library(dplyr, warn.conflicts = FALSE)
+library(farr, warn.conflicts = FALSE)
+library(DBI)
+
+db <- dbConnect(duckdb::duckdb())
+
+sub_notes <- load_parquet(db, "sub_notes_*", "dera_notes")
+
+sub_notes |> 
+  arrange(desc(accepted)) |> 
+  select(adsh, cik, name, form, accepted)
 ```
 
 In Python Polars, the same repository can be scanned using `era_pl`:
@@ -165,5 +168,12 @@ In Python Polars, the same repository can be scanned using `era_pl`:
 ``` python
 from era_pl import load_parquet
 
-sub = load_parquet("sub_notes_*", "dera_notes")
+sub_notes = load_parquet("sub_notes_*", "dera_notes")
+
+(
+  sub_notes
+  .sort("accepted", descending=True) 
+  .select("adsh", "cik", "name", "form", "accepted")
+  .show()
+)
 ```
