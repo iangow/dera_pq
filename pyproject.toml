@@ -1,0 +1,11 @@
+[project]
+name = "dera-pq"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "era-py[polars]",
+    "python-dotenv",
+]
+
+[tool.uv.sources]
+era-py = { path = "../era_py", editable = true }

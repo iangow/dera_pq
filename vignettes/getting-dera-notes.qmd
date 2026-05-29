@@ -7,7 +7,7 @@ title: "Getting SEC DERA XBRL data"
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval = FALSE
+  eval = TRUE
 )
 ```
 
@@ -149,25 +149,50 @@ different local time zones.
 ## Working with the Parquet files
 
 Once created, the Parquet files can be read by Arrow, DuckDB, Polars, or other
-tools. In R, Arrow can open all periods for a table with a wildcard-like file
-listing:
+tools. 
+
+### Using R
+
+In R, you could use `load_parquet()` from my `farr` package.
+
 
 ```{r}
 #| eval: false
-library(arrow)
-dplyr::open_dataset(
-  list.files(
-    file.path(Sys.getenv("DATA_DIR"), "dera_notes"),
-    pattern = "^sub_notes_.*\\.parquet$",
-    full.names = TRUE
-  )
-)
+library(dplyr, warn.conflicts = FALSE)
+library(farr, warn.conflicts = FALSE)
+library(DBI)
+
+db <- dbConnect(duckdb::duckdb())
+
+sub_notes <- load_parquet(db, "sub_notes_*", "dera_notes")
+
+sub_notes |> 
+  arrange(desc(accepted)) |> 
+  select(adsh, cik, name, form, accepted)
 ```
+
+See the [published R edition](https://iangow.github.io/far_book/) of *Empirical Research in Accounting: Tools and Methods* for more examples using `farr` and Parquet files.
+
+### Using Python Polars
 
 In Python Polars, the same repository can be scanned using `era_pl`:
 
-```python
+```{r}
+#| include: false
+reticulate::use_virtualenv(here::here(".venv"), required = TRUE)
+```
+
+```{python}
 from era_pl import load_parquet
 
-sub = load_parquet("sub_notes_*", "dera_notes")
+sub_notes = load_parquet("sub_notes_*", "dera_notes")
+
+(
+    sub_notes
+    .sort("accepted", descending=True) 
+    .select("adsh", "cik", "name", "form", "accepted")
+    .show()
+)
 ```
+
+See the [Python Polars edition](https://iangow.github.io/era_pl_book/) of *Empirical Research in Accounting: Tools and Methods* for more examples using `era_pl` and Parquet files.

@@ -14,3 +14,7 @@ vignettes/*_files/
 .httr-oauth
 .quarto
 .positai
+
+/.quarto/
+**/*.quarto_ipynb
+.venv/
