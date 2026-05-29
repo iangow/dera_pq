@@ -7,6 +7,16 @@ Parquet files in a local `DATA_DIR` repository.
 The package is based on the scripts `get_dera.R` and `get_dera_notes.R`
 from `~/git/notes/published`.
 
+## Installation
+
+Install the development version from GitHub with `pak`:
+
+``` r
+
+install.packages("pak")
+pak::pak("iangow/dera_pq")
+```
+
 ## Setup
 
 ``` r
