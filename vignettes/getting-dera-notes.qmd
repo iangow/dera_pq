@@ -155,9 +155,8 @@ tools.
 
 In R, you could use `load_parquet()` from my `farr` package.
 
-
 ```{r}
-#| eval: false
+#| eval: true
 library(dplyr, warn.conflicts = FALSE)
 library(farr, warn.conflicts = FALSE)
 library(DBI)
