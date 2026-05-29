@@ -166,6 +166,22 @@ sub_notes <- load_parquet(db, "sub_notes_*", "dera_notes")
 sub_notes |> 
   arrange(desc(accepted)) |> 
   select(adsh, cik, name, form, accepted)
+#> # Source:     SQL [?? x 5]
+#> # Database:   DuckDB 1.5.2 [root@Darwin 25.5.0:R 4.6.0/:memory:]
+#> # Ordered by: desc(accepted)
+#>    adsh                     cik name                   form  accepted           
+#>    <chr>                  <int> <chr>                  <chr> <dttm>             
+#>  1 0001493152-26-020705 1624326 PAVMED INC.            DEF … 2026-05-01 09:29:00
+#>  2 0001193125-26-197921 1613780 DBV TECHNOLOGIES S.A.  8-K   2026-04-30 17:31:00
+#>  3 0001213900-26-050440 1997201 PS INTERNATIONAL GROU… 20-F  2026-04-30 17:31:00
+#>  4 0001104659-26-053195 1850235 D-MARKET ELECTRONIC S… 20-F  2026-04-30 17:30:00
+#>  5 0001193125-26-197914 1602842 ORION DIGITAL CORP.    20-F  2026-04-30 17:30:00
+#>  6 0001193125-26-197916 1045609 PROLOGIS, INC.         8-K   2026-04-30 17:30:00
+#>  7 0001477932-26-002697 1854526 DYNAMIC AEROSPACE SYS… 8-K   2026-04-30 17:30:00
+#>  8 0001193125-26-197911 1738177 CAMBIUM NETWORKS CORP  10-Q  2026-04-30 17:29:00
+#>  9 0001213900-26-050434 2087587 COINSHARES PLC         20-F  2026-04-30 17:29:00
+#> 10 0001493152-26-020770 1857086 TRUGOLF HOLDINGS, INC. 10-K… 2026-04-30 17:29:00
+#> # ℹ more rows
 ```
 
 See the [published R edition](https://iangow.github.io/far_book/) of

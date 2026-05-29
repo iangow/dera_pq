@@ -162,7 +162,23 @@
 <span></span>
 <span><span class="va">sub_notes</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">accepted</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">adsh</span>, <span class="va">cik</span>, <span class="va">name</span>, <span class="va">form</span>, <span class="va">accepted</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">adsh</span>, <span class="va">cik</span>, <span class="va">name</span>, <span class="va">form</span>, <span class="va">accepted</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # Source:     SQL [?? x 5]</span></span>
+<span><span class="co">#&gt; # Database:   DuckDB 1.5.2 [root@Darwin 25.5.0:R 4.6.0/:memory:]</span></span>
+<span><span class="co">#&gt; # Ordered by: desc(accepted)</span></span>
+<span><span class="co">#&gt;    adsh                     cik name                   form  accepted           </span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;                  &lt;int&gt; &lt;chr&gt;                  &lt;chr&gt; &lt;dttm&gt;             </span></span>
+<span><span class="co">#&gt;  1 0001493152-26-020705 1624326 PAVMED INC.            DEF … 2026-05-01 09:29:00</span></span>
+<span><span class="co">#&gt;  2 0001193125-26-197921 1613780 DBV TECHNOLOGIES S.A.  8-K   2026-04-30 17:31:00</span></span>
+<span><span class="co">#&gt;  3 0001213900-26-050440 1997201 PS INTERNATIONAL GROU… 20-F  2026-04-30 17:31:00</span></span>
+<span><span class="co">#&gt;  4 0001104659-26-053195 1850235 D-MARKET ELECTRONIC S… 20-F  2026-04-30 17:30:00</span></span>
+<span><span class="co">#&gt;  5 0001193125-26-197914 1602842 ORION DIGITAL CORP.    20-F  2026-04-30 17:30:00</span></span>
+<span><span class="co">#&gt;  6 0001193125-26-197916 1045609 PROLOGIS, INC.         8-K   2026-04-30 17:30:00</span></span>
+<span><span class="co">#&gt;  7 0001477932-26-002697 1854526 DYNAMIC AEROSPACE SYS… 8-K   2026-04-30 17:30:00</span></span>
+<span><span class="co">#&gt;  8 0001193125-26-197911 1738177 CAMBIUM NETWORKS CORP  10-Q  2026-04-30 17:29:00</span></span>
+<span><span class="co">#&gt;  9 0001213900-26-050434 2087587 COINSHARES PLC         20-F  2026-04-30 17:29:00</span></span>
+<span><span class="co">#&gt; 10 0001493152-26-020770 1857086 TRUGOLF HOLDINGS, INC. 10-K… 2026-04-30 17:29:00</span></span>
+<span><span class="co">#&gt; # ℹ more rows</span></span></code></pre></div>
 </div>
 <p>See the <a href="https://iangow.github.io/far_book/" class="external-link">published R edition</a> of <em>Empirical Research in Accounting: Tools and Methods</em> for more examples using <code>farr</code> and Parquet files.</p>
 </section><section class="level3"><h3 id="using-python-polars">Using Python Polars<a class="anchor" aria-label="anchor" href="#using-python-polars"></a>
