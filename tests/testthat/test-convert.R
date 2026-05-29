@@ -570,3 +570,84 @@ test_that("tag dim and ren notes numeric columns are parsed with tighter types",
   expect_type(ren$parentreport, "integer")
   expect_type(ren$ultparentrpt, "integer")
 })
+
+test_that("standard DERA sub tag num and pre columns parse with tighter types", {
+  skip_if(Sys.which("zip") == "")
+
+  tmp <- tempfile()
+  dir.create(tmp)
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
+
+  sub_cols <- c(
+    "adsh", "cik", "name", "sic", "countryba", "stprba", "cityba", "zipba",
+    "bas1", "bas2", "baph", "countryma", "stprma", "cityma", "zipma",
+    "mas1", "mas2", "countryinc", "stprinc", "ein", "former", "changed",
+    "afs", "wksi", "fye", "form", "period", "fy", "fp", "filed", "accepted",
+    "prevrpt", "detail", "instance", "nciks", "aciks"
+  )
+  sub_values <- c(
+    "0000000000-00-000000", "123456", "Example Inc.", "2834", "US", "CA",
+    "San Francisco", "94105", "1 Main St", "", "415-555-1212", "US", "CA",
+    "San Francisco", "94105", "1 Main St", "", "US", "DE", "12-3456789",
+    "", "20240101", "1-LAF", "1", "1231", "10-K", "20231231", "2023",
+    "FY", "20240215", "2024-02-15 16:01:02", "0", "1", "example.htm",
+    "2", ""
+  )
+  writeLines(
+    c(paste(sub_cols, collapse = "\t"), paste(sub_values, collapse = "\t")),
+    file.path(tmp, "sub.txt")
+  )
+  writeLines(
+    c(
+      paste(c("tag", "version", "custom", "abstract", "datatype",
+              "iord", "crdr", "tlabel", "doc"), collapse = "\t"),
+      paste(c("Revenue", "us-gaap/2024", "1", "0", "monetary",
+              "I", "credit", "Revenue", "Documentation"), collapse = "\t")
+    ),
+    file.path(tmp, "tag.txt")
+  )
+  writeLines(
+    c(
+      paste(c("adsh", "tag", "version", "ddate", "qtrs", "uom",
+              "segments", "coreg", "value", "footnote"), collapse = "\t"),
+      paste(c("0000000000-00-000000", "Revenue", "us-gaap/2024", "20231231",
+              "4", "USD", "", "", "1234.56", ""), collapse = "\t")
+    ),
+    file.path(tmp, "num.txt")
+  )
+  writeLines(
+    c(
+      paste(c("adsh", "report", "line", "stmt", "inpth", "rfile",
+              "tag", "version", "plabel", "negating"), collapse = "\t"),
+      paste(c("0000000000-00-000000", "4", "12", "CF", "0", "H",
+              "NetIncomeLoss", "us-gaap/2024", "Net income", "1"), collapse = "\t")
+    ),
+    file.path(tmp, "pre.txt")
+  )
+
+  old_wd <- setwd(tmp)
+  on.exit(setwd(old_wd), add = TRUE)
+  utils::zip("source.zip", c("sub.txt", "tag.txt", "num.txt", "pre.txt"), flags = "-q")
+
+  specs <- dera_datasets("dera")$table_specs
+  sub <- read_zip_table("source.zip", specs$sub, "test.zip", "sub")
+  tag <- read_zip_table("source.zip", specs$tag, "test.zip", "tag")
+  num <- read_zip_table("source.zip", specs$num, "test.zip", "num")
+  pre <- read_zip_table("source.zip", specs$pre, "test.zip", "pre")
+
+  expect_type(sub$cik, "integer")
+  expect_type(sub$sic, "integer")
+  expect_type(sub$wksi, "logical")
+  expect_type(sub$fy, "integer")
+  expect_type(sub$prevrpt, "logical")
+  expect_type(sub$detail, "logical")
+  expect_type(sub$nciks, "integer")
+  expect_type(tag$custom, "logical")
+  expect_type(tag$abstract, "logical")
+  expect_type(num$qtrs, "integer")
+  expect_type(num$value, "double")
+  expect_type(pre$report, "integer")
+  expect_type(pre$line, "integer")
+  expect_type(pre$inpth, "logical")
+  expect_type(pre$negating, "logical")
+})

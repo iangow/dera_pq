@@ -7,6 +7,15 @@ test_that("dataset configuration resolves standard DERA data", {
   expect_equal(cfg$period("2024q1.zip"), "2024q1")
 })
 
+test_that("standard DERA specs tighten numeric metadata fields", {
+  specs <- dera_datasets("dera")$table_specs
+
+  expect_equal(specs$sub$col_types, "cicicccccccccccccccccdclccdicdcllcic")
+  expect_equal(specs$tag$col_types, "ccllccccc")
+  expect_equal(specs$num$col_types, "ccccicccdc")
+  expect_equal(specs$pre$col_types, "ciiclccccl")
+})
+
 test_that("dataset configuration resolves DERA notes data", {
   cfg <- dera_datasets("dera_notes")
 

@@ -38,17 +38,17 @@ dera_table_specs <- function() {
   list(
     sub = table_spec(
       source = "sub.txt",
-      col_types = "cdcdcccccccccccccccccdcdccddcdcddcdc",
+      col_types = "cicicccccccccccccccccdclccdicdcllcic",
       date_cols = c("changed", "filed", "period"),
       datetime_cols = "accepted"
     ),
     tag = table_spec(
       source = "tag.txt",
-      col_types = "ccddccccc"
+      col_types = "ccllccccc"
     ),
     num = table_spec(
       source = "num.txt",
-      col_types = "ccccdcccdc",
+      col_types = "ccccicccdc",
       date_cols = "ddate"
     ),
     pre = table_spec(
