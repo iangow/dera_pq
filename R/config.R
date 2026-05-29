@@ -68,7 +68,9 @@ dera_notes_table_specs <- function() {
     ),
     tag_notes = table_spec(
       source = "tag.tsv",
-      col_types = "ccddccccc"
+      col_types = "ccddccccc",
+      fallback_quote = "",
+      repair_tabs = TRUE
     ),
     dim_notes = table_spec(
       source = "dim.tsv",
@@ -77,21 +79,26 @@ dera_notes_table_specs <- function() {
     num_notes = table_spec(
       source = "num.tsv",
       col_types = "cccddccddcddcddd",
-      date_cols = "ddate"
+      date_cols = "ddate",
+      fallback_quote = ""
     ),
     txt_notes = table_spec(
       source = "txt.tsv",
       col_types = "cccdddcdddcdcdddcdcc",
-      date_cols = "ddate"
+      date_cols = "ddate",
+      fallback_quote = "",
+      repair_tabs = TRUE
     ),
     ren_notes = table_spec(
       source = "ren.tsv",
       col_types = "cdccccccdd",
-      quote = ""
+      fallback_quote = ""
     ),
     pre_notes = table_spec(
       source = "pre.tsv",
-      col_types = "cddcdccccd"
+      col_types = "cddcdccccd",
+      fallback_quote = "",
+      repair_tabs = TRUE
     ),
     cal_notes = table_spec(
       source = "cal.tsv",
@@ -101,12 +108,15 @@ dera_notes_table_specs <- function() {
 }
 
 table_spec <- function(source, col_types, date_cols = character(),
-                       datetime_cols = character(), quote = "\"") {
+                       datetime_cols = character(), quote = "\"",
+                       fallback_quote = NULL, repair_tabs = FALSE) {
   list(
     source = source,
     col_types = col_types,
     date_cols = date_cols,
     datetime_cols = datetime_cols,
-    quote = quote
+    quote = quote,
+    fallback_quote = fallback_quote,
+    repair_tabs = repair_tabs
   )
 }

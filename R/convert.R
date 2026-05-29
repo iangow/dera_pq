@@ -100,10 +100,70 @@ download_zip <- function(url, user_agent = NULL, quiet = FALSE,
 
 read_zip_table <- function(zip_file, spec, source_file = basename(zip_file),
                            table = spec$source) {
+  parsed <- .read_zip_table_once(
+    unz(zip_file, spec$source),
+    spec = spec
+  )
+  initial_problems <- parsed$problems
+  repairs <- character()
+
+  if (nrow(initial_problems) > 0 && !is.null(spec$fallback_quote)) {
+    fallback_spec <- spec
+    fallback_spec$quote <- spec$fallback_quote
+    parsed_fallback <- .read_zip_table_once(
+      unz(zip_file, spec$source),
+      spec = fallback_spec
+    )
+    if (nrow(parsed_fallback$problems) <= nrow(parsed$problems)) {
+      parsed <- parsed_fallback
+      repairs <- c(repairs, "quote-fallback")
+    }
+  }
+
+  if (nrow(parsed$problems) > 0 && isTRUE(spec$repair_tabs)) {
+    repaired_input <- .repair_zip_table_tabs(zip_file, spec)
+    repair_spec <- spec
+    if (!is.null(spec$fallback_quote)) {
+      repair_spec$quote <- spec$fallback_quote
+    }
+    parsed_repaired <- .read_zip_table_once(
+      repaired_input,
+      spec = repair_spec
+    )
+    if (nrow(parsed_repaired$problems) <= nrow(parsed$problems)) {
+      parsed <- parsed_repaired
+      repairs <- union(repairs, "tab-repair")
+    }
+  }
+
+  df <- parsed$df
+
+  problems <- .warn_parsing_problems(
+    df = df,
+    source_file = source_file,
+    table = table,
+    source = spec$source,
+    parsing_warning = parsed$parsing_warning
+  )
+  attr(df, "dera_parse_problems") <- problems
+  attr(df, "dera_initial_parse_problems") <- initial_problems
+  attr(df, "dera_parse_repairs") <- repairs
+
+  for (col in spec$date_cols) {
+    df[[col]] <- lubridate::ymd(df[[col]])
+  }
+  for (col in spec$datetime_cols) {
+    df[[col]] <- lubridate::ymd_hms(df[[col]])
+  }
+
+  df
+}
+
+.read_zip_table_once <- function(input, spec) {
   parsing_warning <- FALSE
   df <- withCallingHandlers(
     readr::read_tsv(
-      unz(zip_file, spec$source),
+      input,
       col_types = spec$col_types,
       progress = FALSE,
       quote = spec$quote %||% "\""
@@ -116,23 +176,40 @@ read_zip_table <- function(zip_file, spec, source_file = basename(zip_file),
     }
   )
 
-  problems <- .warn_parsing_problems(
+  list(
     df = df,
-    source_file = source_file,
-    table = table,
-    source = spec$source,
+    problems = readr::problems(df),
     parsing_warning = parsing_warning
   )
-  attr(df, "dera_parse_problems") <- problems
+}
 
-  for (col in spec$date_cols) {
-    df[[col]] <- lubridate::ymd(df[[col]])
+.repair_zip_table_tabs <- function(zip_file, spec) {
+  con <- unz(zip_file, spec$source)
+  on.exit(close(con), add = TRUE)
+  lines <- readLines(con, warn = FALSE)
+  I(paste(.repair_tsv_lines(lines, nchar(spec$col_types)), collapse = "\n"))
+}
+
+.repair_tsv_lines <- function(lines, expected_cols) {
+  vapply(lines, .repair_tsv_line, character(1), expected_cols = expected_cols)
+}
+
+.repair_tsv_line <- function(line, expected_cols) {
+  fields <- strsplit(line, "\t", fixed = TRUE)[[1]]
+  n_fields <- length(fields)
+
+  if (n_fields == expected_cols) {
+    return(line)
   }
-  for (col in spec$datetime_cols) {
-    df[[col]] <- lubridate::ymd_hms(df[[col]])
+  if (n_fields < expected_cols) {
+    return(paste(c(fields, rep("", expected_cols - n_fields)), collapse = "\t"))
   }
 
-  df
+  paste(
+    c(fields[seq_len(expected_cols - 1L)],
+      paste(fields[expected_cols:n_fields], collapse = " ")),
+    collapse = "\t"
+  )
 }
 
 .parsing_metadata <- function(df, table, source) {
@@ -140,12 +217,20 @@ read_zip_table <- function(zip_file, spec, source_file = basename(zip_file),
   if (is.null(problems)) {
     problems <- readr::problems(df)
   }
+  initial_problems <- attr(df, "dera_initial_parse_problems")
+  if (is.null(initial_problems)) {
+    initial_problems <- problems
+  }
+  repairs <- attr(df, "dera_parse_repairs") %||% character()
 
   list(
     dera_source_table = table,
     dera_source_inner_file = source,
     dera_parse_problem_count = as.character(nrow(problems)),
-    dera_parse_problem_rows = paste(utils::head(problems$row, 50), collapse = ",")
+    dera_parse_problem_rows = paste(utils::head(problems$row, 50), collapse = ","),
+    dera_initial_parse_problem_count = as.character(nrow(initial_problems)),
+    dera_initial_parse_problem_rows = paste(utils::head(initial_problems$row, 50), collapse = ","),
+    dera_parse_repairs = paste(repairs, collapse = ",")
   )
 }
 

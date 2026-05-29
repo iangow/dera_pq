@@ -100,6 +100,100 @@ test_that("read_zip_table keeps quoted tabs when quote parsing is enabled", {
   expect_equal(df$segt, 0)
 })
 
+test_that("tab repair folds extra trailing text fields", {
+  line <- paste(c("a", "b", "text", "with", "tabs"), collapse = "\t")
+
+  expect_equal(
+    .repair_tsv_line(line, expected_cols = 3),
+    paste(c("a", "b", "text with tabs"), collapse = "\t")
+  )
+  expect_equal(
+    .repair_tsv_line("a\tb", expected_cols = 3),
+    "a\tb\t"
+  )
+})
+
+test_that("read_zip_table repairs embedded tabs in trailing text columns", {
+  skip_if(Sys.which("zip") == "")
+
+  tmp <- tempfile()
+  dir.create(tmp)
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
+
+  writeLines(
+    c(
+      paste(c("a", "b", "value"), collapse = "\t"),
+      paste(c("x", "y", "text", "with", "tabs"), collapse = "\t")
+    ),
+    file.path(tmp, "txt.tsv")
+  )
+  old_wd <- setwd(tmp)
+  on.exit(setwd(old_wd), add = TRUE)
+  utils::zip("source.zip", "txt.tsv", flags = "-q")
+
+  spec <- table_spec(
+    source = "txt.tsv",
+    col_types = "ccc",
+    fallback_quote = "",
+    repair_tabs = TRUE
+  )
+  expect_warning(
+    df <- read_zip_table(
+      "source.zip",
+      spec,
+      source_file = "test_notes.zip",
+      table = "txt_notes"
+    ),
+    NA
+  )
+
+  expect_equal(df$value, "text with tabs")
+  expect_equal(nrow(attr(df, "dera_initial_parse_problems")), 1)
+  expect_equal(nrow(attr(df, "dera_parse_problems")), 0)
+  expect_equal(attr(df, "dera_parse_repairs"), c("quote-fallback", "tab-repair"))
+  expect_equal(
+    .parsing_metadata(df, "txt_notes", "txt.tsv")$dera_initial_parse_problem_count,
+    "1"
+  )
+  expect_equal(
+    .parsing_metadata(df, "txt_notes", "txt.tsv")$dera_parse_repairs,
+    "quote-fallback,tab-repair"
+  )
+})
+
+test_that("fallback quote parsing is only used after an initial problem", {
+  skip_if(Sys.which("zip") == "")
+
+  tmp <- tempfile()
+  dir.create(tmp)
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
+
+  writeLines(
+    c(
+      paste(c("id", "text"), collapse = "\t"),
+      paste(c("1", "\"quoted text\""), collapse = "\t")
+    ),
+    file.path(tmp, "tag.tsv")
+  )
+  old_wd <- setwd(tmp)
+  on.exit(setwd(old_wd), add = TRUE)
+  utils::zip("source.zip", "tag.tsv", flags = "-q")
+
+  spec <- table_spec(source = "tag.tsv", col_types = "cc", fallback_quote = "")
+  expect_warning(
+    df <- read_zip_table(
+      "source.zip",
+      spec,
+      source_file = "test_notes.zip",
+      table = "tag_notes"
+    ),
+    NA
+  )
+
+  expect_equal(df$text, "quoted text")
+  expect_equal(attr(df, "dera_parse_repairs"), character())
+})
+
 test_that("parse problem metadata is available for parquet writes", {
   skip_if(Sys.which("zip") == "")
 
