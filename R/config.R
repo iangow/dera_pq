@@ -53,7 +53,7 @@ dera_table_specs <- function() {
     ),
     pre = table_spec(
       source = "pre.txt",
-      col_types = "cddcdccccd"
+      col_types = "ciiclccccl"
     )
   )
 }
@@ -62,47 +62,47 @@ dera_notes_table_specs <- function() {
   list(
     sub_notes = table_spec(
       source = "sub.tsv",
-      col_types = "cdcccccccccccccccccccdcdccddcdcddcdcddcd",
+      col_types = "cicccccccccccccccccccdclccdicdcllcicddci",
       date_cols = c("changed", "filed", "period", "floatdate"),
       datetime_cols = "accepted"
     ),
     tag_notes = table_spec(
       source = "tag.tsv",
-      col_types = "ccddccccc",
+      col_types = "ccllccccc",
       fallback_quote = "",
       repair_tabs = TRUE
     ),
     dim_notes = table_spec(
       source = "dim.tsv",
-      col_types = "ccd"
+      col_types = "cci"
     ),
     num_notes = table_spec(
       source = "num.tsv",
-      col_types = "cccddccddcddcddd",
+      col_types = "cccdiccidciicddi",
       date_cols = "ddate",
       fallback_quote = ""
     ),
     txt_notes = table_spec(
       source = "txt.tsv",
-      col_types = "cccdddcdddcdcdddcdcc",
+      col_types = "cccdiiciddcicliicicc",
       date_cols = "ddate",
       fallback_quote = "",
       repair_tabs = TRUE
     ),
     ren_notes = table_spec(
       source = "ren.tsv",
-      col_types = "cdccccccdd",
+      col_types = "ciccccccii",
       fallback_quote = ""
     ),
     pre_notes = table_spec(
       source = "pre.tsv",
-      col_types = "cddcdccccd",
+      col_types = "ciiclccccl",
       fallback_quote = "",
       repair_tabs = TRUE
     ),
     cal_notes = table_spec(
       source = "cal.tsv",
-      col_types = "cdddcccc"
+      col_types = "ciiicccc"
     )
   )
 }
