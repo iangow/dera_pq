@@ -146,7 +146,10 @@
 <p>The UTC field avoids false update decisions when code is run in sessions with different local time zones.</p>
 </section><section class="level2"><h2 id="working-with-the-parquet-files">Working with the Parquet files<a class="anchor" aria-label="anchor" href="#working-with-the-parquet-files"></a>
 </h2>
-<p>Once created, the Parquet files can be read by Arrow, DuckDB, Polars, or other tools. In R, Arrow can open all periods for a table with a wildcard-like file listing:</p>
+<p>Once created, the Parquet files can be read by Arrow, DuckDB, Polars, or other tools.</p>
+<section class="level3"><h3 id="using-r">Using R<a class="anchor" aria-label="anchor" href="#using-r"></a>
+</h3>
+<p>In R, you could use <code><a href="https://rdrr.io/pkg/farr/man/load_parquet.html" class="external-link">load_parquet()</a></code> from my <code>farr</code> package.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span>, warn.conflicts <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -161,6 +164,9 @@
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">accepted</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">adsh</span>, <span class="va">cik</span>, <span class="va">name</span>, <span class="va">form</span>, <span class="va">accepted</span><span class="op">)</span></span></code></pre></div>
 </div>
+<p>See the <a href="https://iangow.github.io/far_book/" class="external-link">published R edition</a> of <em>Empirical Research in Accounting: Tools and Methods</em> for more examples using <code>farr</code> and Parquet files.</p>
+</section><section class="level3"><h3 id="using-python-polars">Using Python Polars<a class="anchor" aria-label="anchor" href="#using-python-polars"></a>
+</h3>
 <p>In Python Polars, the same repository can be scanned using <code>era_pl</code>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> era_pl <span class="im">import</span> load_parquet</span>
@@ -168,13 +174,26 @@
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>sub_notes <span class="op">=</span> load_parquet(<span class="st">"sub_notes_*"</span>, <span class="st">"dera_notes"</span>)</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>(</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  sub_notes</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  .sort(<span class="st">"accepted"</span>, descending<span class="op">=</span><span class="va">True</span>) </span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  .select(<span class="st">"adsh"</span>, <span class="st">"cik"</span>, <span class="st">"name"</span>, <span class="st">"form"</span>, <span class="st">"accepted"</span>)</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  .show()</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    sub_notes</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    .sort(<span class="st">"accepted"</span>, descending<span class="op">=</span><span class="va">True</span>) </span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    .select(<span class="st">"adsh"</span>, <span class="st">"cik"</span>, <span class="st">"name"</span>, <span class="st">"form"</span>, <span class="st">"accepted"</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    .show()</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; shape: (5, 5)</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ┌──────────────────────┬─────────┬─────────────────────────────┬─────────┬─────────────────────────┐</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; │ adsh                 ┆ cik     ┆ name                        ┆ form    ┆ accepted                │</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; │ ---                  ┆ ---     ┆ ---                         ┆ ---     ┆ ---                     │</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; │ str                  ┆ i32     ┆ str                         ┆ str     ┆ datetime[μs, UTC]       │</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ╞══════════════════════╪═════════╪═════════════════════════════╪═════════╪═════════════════════════╡</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; │ 0001493152-26-020705 ┆ 1624326 ┆ PAVMED INC.                 ┆ DEF 14A ┆ 2026-05-01 09:29:00 UTC │</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; │ 0001193125-26-197921 ┆ 1613780 ┆ DBV TECHNOLOGIES S.A.       ┆ 8-K     ┆ 2026-04-30 17:31:00 UTC │</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; │ 0001213900-26-050440 ┆ 1997201 ┆ PS INTERNATIONAL GROUP LTD. ┆ 20-F    ┆ 2026-04-30 17:31:00 UTC │</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; │ 0001193125-26-197916 ┆ 1045609 ┆ PROLOGIS, INC.              ┆ 8-K     ┆ 2026-04-30 17:30:00 UTC │</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; │ 0001193125-26-197914 ┆ 1602842 ┆ ORION DIGITAL CORP.         ┆ 20-F    ┆ 2026-04-30 17:30:00 UTC │</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; └──────────────────────┴─────────┴─────────────────────────────┴─────────┴─────────────────────────┘</span></span></code></pre></div>
 </div>
-</section><script id="quarto-html-after-body" type="application/javascript">
+<p>See the <a href="https://iangow.github.io/era_pl_book/" class="external-link">Python Polars edition</a> of <em>Empirical Research in Accounting: Tools and Methods</em> for more examples using <code>era_pl</code> and Parquet files.</p>
+</section></section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);

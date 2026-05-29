@@ -145,8 +145,13 @@ with different local time zones.
 ## Working with the Parquet files
 
 Once created, the Parquet files can be read by Arrow, DuckDB, Polars, or
-other tools. In R, Arrow can open all periods for a table with a
-wildcard-like file listing:
+other tools.
+
+### Using R
+
+In R, you could use
+[`load_parquet()`](https://rdrr.io/pkg/farr/man/load_parquet.html) from
+my `farr` package.
 
 ``` r
 
@@ -163,6 +168,12 @@ sub_notes |>
   select(adsh, cik, name, form, accepted)
 ```
 
+See the [published R edition](https://iangow.github.io/far_book/) of
+*Empirical Research in Accounting: Tools and Methods* for more examples
+using `farr` and Parquet files.
+
+### Using Python Polars
+
 In Python Polars, the same repository can be scanned using `era_pl`:
 
 ``` python
@@ -171,9 +182,25 @@ from era_pl import load_parquet
 sub_notes = load_parquet("sub_notes_*", "dera_notes")
 
 (
-  sub_notes
-  .sort("accepted", descending=True) 
-  .select("adsh", "cik", "name", "form", "accepted")
-  .show()
+    sub_notes
+    .sort("accepted", descending=True) 
+    .select("adsh", "cik", "name", "form", "accepted")
+    .show()
 )
+#> shape: (5, 5)
+#> ┌──────────────────────┬─────────┬─────────────────────────────┬─────────┬─────────────────────────┐
+#> │ adsh                 ┆ cik     ┆ name                        ┆ form    ┆ accepted                │
+#> │ ---                  ┆ ---     ┆ ---                         ┆ ---     ┆ ---                     │
+#> │ str                  ┆ i32     ┆ str                         ┆ str     ┆ datetime[μs, UTC]       │
+#> ╞══════════════════════╪═════════╪═════════════════════════════╪═════════╪═════════════════════════╡
+#> │ 0001493152-26-020705 ┆ 1624326 ┆ PAVMED INC.                 ┆ DEF 14A ┆ 2026-05-01 09:29:00 UTC │
+#> │ 0001193125-26-197921 ┆ 1613780 ┆ DBV TECHNOLOGIES S.A.       ┆ 8-K     ┆ 2026-04-30 17:31:00 UTC │
+#> │ 0001213900-26-050440 ┆ 1997201 ┆ PS INTERNATIONAL GROUP LTD. ┆ 20-F    ┆ 2026-04-30 17:31:00 UTC │
+#> │ 0001193125-26-197916 ┆ 1045609 ┆ PROLOGIS, INC.              ┆ 8-K     ┆ 2026-04-30 17:30:00 UTC │
+#> │ 0001193125-26-197914 ┆ 1602842 ┆ ORION DIGITAL CORP.         ┆ 20-F    ┆ 2026-04-30 17:30:00 UTC │
+#> └──────────────────────┴─────────┴─────────────────────────────┴─────────┴─────────────────────────┘
 ```
+
+See the [Python Polars edition](https://iangow.github.io/era_pl_book/)
+of *Empirical Research in Accounting: Tools and Methods* for more
+examples using `era_pl` and Parquet files.
