@@ -7,7 +7,13 @@ and writes `sub`, `tag`, `num`, and `pre` Parquet files under
 ## Usage
 
 ``` r
-update_dera(data_dir = NULL, user_agent = NULL, quiet = FALSE)
+update_dera(
+  data_dir = NULL,
+  user_agent = NULL,
+  quiet = FALSE,
+  cache = TRUE,
+  force = FALSE
+)
 ```
 
 ## Arguments
@@ -25,6 +31,18 @@ update_dera(data_dir = NULL, user_agent = NULL, quiet = FALSE)
 - quiet:
 
   If `TRUE`, suppress progress messages.
+
+- cache:
+
+  If `TRUE`, cache downloaded zip files under
+  `tools::R_user_dir("dera.pq", "cache")`. If a string, use that
+  directory as the zip cache. If `FALSE`, download to a temporary file
+  and delete it after processing.
+
+- force:
+
+  If `TRUE`, reprocess all SEC source zip files listed by the SEC even
+  when the local Parquet files already appear current.
 
 ## Value
 

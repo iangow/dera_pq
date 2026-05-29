@@ -6,7 +6,13 @@ its component Parquet files under `$DATA_DIR/dera`.
 ## Usage
 
 ``` r
-update_dera_file(file, data_dir = NULL, user_agent = NULL, quiet = FALSE)
+update_dera_file(
+  file,
+  data_dir = NULL,
+  user_agent = NULL,
+  quiet = FALSE,
+  cache = TRUE
+)
 ```
 
 ## Arguments
@@ -27,6 +33,13 @@ update_dera_file(file, data_dir = NULL, user_agent = NULL, quiet = FALSE)
 - quiet:
 
   If `TRUE`, suppress progress messages.
+
+- cache:
+
+  If `TRUE`, cache downloaded zip files under
+  `tools::R_user_dir("dera.pq", "cache")`. If a string, use that
+  directory as the zip cache. If `FALSE`, download to a temporary file
+  and delete it after processing.
 
 ## Value
 

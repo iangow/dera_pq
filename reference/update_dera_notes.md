@@ -10,7 +10,9 @@ update_dera_notes(
   data_dir = NULL,
   user_agent = NULL,
   archive_orphans = TRUE,
-  quiet = FALSE
+  quiet = FALSE,
+  cache = TRUE,
+  force = FALSE
 )
 ```
 
@@ -34,6 +36,18 @@ update_dera_notes(
 - quiet:
 
   If `TRUE`, suppress progress messages.
+
+- cache:
+
+  If `TRUE`, cache downloaded zip files under
+  `tools::R_user_dir("dera.pq", "cache")`. If a string, use that
+  directory as the zip cache. If `FALSE`, download to a temporary file
+  and delete it after processing.
+
+- force:
+
+  If `TRUE`, reprocess all SEC source zip files listed by the SEC even
+  when the local Parquet files already appear current.
 
 ## Value
 
