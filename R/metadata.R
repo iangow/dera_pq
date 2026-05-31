@@ -37,11 +37,23 @@ dera_metadata <- function(dataset, file, source_url, last_modified) {
 write_parquet_with_metadata <- function(df, sink, metadata) {
   tab <- arrow::arrow_table(df)
   existing <- tab$schema$metadata
-  if (is.null(existing)) {
-    existing <- list()
-  }
-  tab <- tab$ReplaceSchemaMetadata(c(existing, metadata))
+  metadata <- scalar_parquet_metadata(c(existing, metadata))
+  tab <- tab$ReplaceSchemaMetadata(metadata)
   arrow::write_parquet(tab, sink = sink)
+}
+
+scalar_parquet_metadata <- function(metadata) {
+  if (is.null(metadata)) {
+    return(list())
+  }
+
+  keep <- vapply(
+    metadata,
+    function(x) is.atomic(x) && length(x) == 1L && !is.na(x),
+    logical(1)
+  )
+  metadata <- lapply(metadata[keep], as.character)
+  metadata[!duplicated(names(metadata), fromLast = TRUE)]
 }
 
 read_parquet_metadata <- function(path) {

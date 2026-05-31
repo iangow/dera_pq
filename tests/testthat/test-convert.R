@@ -62,6 +62,41 @@ test_that("read_zip_table treats quotes in SEC TSV text as literal characters", 
   expect_match(df$longname, 'Statement - "SUNWIN')
 })
 
+test_that("read_zip_table interprets raw SEC datetimes as New York time", {
+  skip_if(Sys.which("zip") == "")
+
+  tmp <- tempfile()
+  dir.create(tmp)
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
+
+  writeLines(
+    c("accepted", "2024-07-01 16:00:00"),
+    file.path(tmp, "sub.tsv")
+  )
+  old_wd <- setwd(tmp)
+  on.exit(setwd(old_wd), add = TRUE)
+  utils::zip("source.zip", "sub.tsv", flags = "-q")
+
+  spec <- table_spec(
+    source = "sub.tsv",
+    col_types = "c",
+    datetime_cols = "accepted"
+  )
+  df <- read_zip_table(
+    "source.zip",
+    spec,
+    source_file = "test.zip",
+    table = "sub"
+  )
+
+  expect_s3_class(df$accepted, "POSIXct")
+  expect_equal(attr(df$accepted, "tzone"), "America/New_York")
+  expect_equal(
+    as.numeric(df$accepted),
+    as.numeric(as.POSIXct("2024-07-01 20:00:00", tz = "UTC"))
+  )
+})
+
 test_that("read_zip_table keeps quoted tabs when quote parsing is enabled", {
   skip_if(Sys.which("zip") == "")
 

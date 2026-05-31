@@ -98,6 +98,12 @@ download_zip <- function(url, user_agent = NULL, quiet = FALSE,
   nzchar(cached_modified) && http_datetime_equal(cached_modified, last_modified)
 }
 
+sec_raw_datetime_tz <- "America/New_York"
+
+parse_sec_raw_datetime <- function(x) {
+  lubridate::ymd_hms(x, tz = sec_raw_datetime_tz)
+}
+
 read_zip_table <- function(zip_file, spec, source_file = basename(zip_file),
                            table = spec$source) {
   parsed <- .read_zip_table_once(
@@ -153,7 +159,7 @@ read_zip_table <- function(zip_file, spec, source_file = basename(zip_file),
     df[[col]] <- lubridate::ymd(df[[col]])
   }
   for (col in spec$datetime_cols) {
-    df[[col]] <- lubridate::ymd_hms(df[[col]])
+    df[[col]] <- parse_sec_raw_datetime(df[[col]])
   }
 
   df
@@ -231,6 +237,18 @@ read_zip_table <- function(zip_file, spec, source_file = basename(zip_file),
     dera_initial_parse_problem_count = as.character(nrow(initial_problems)),
     dera_initial_parse_problem_rows = paste(utils::head(initial_problems$row, 50), collapse = ","),
     dera_parse_repairs = paste(repairs, collapse = ",")
+  )
+}
+
+.datetime_metadata <- function(spec) {
+  datetime_cols <- spec$datetime_cols %||% character()
+  if (length(datetime_cols) == 0L) {
+    return(list())
+  }
+
+  list(
+    dera_datetime_columns = paste(datetime_cols, collapse = ","),
+    dera_datetime_timezone = sec_raw_datetime_tz
   )
 }
 
@@ -326,7 +344,11 @@ update_dataset_file <- function(file, dataset, data_dir = NULL,
       table,
       period,
       pq_dir,
-      metadata = c(metadata, .parsing_metadata(df, table, spec$source))
+      metadata = c(
+        metadata,
+        .parsing_metadata(df, table, spec$source),
+        .datetime_metadata(spec)
+      )
     )
   })
 

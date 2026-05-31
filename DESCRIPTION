@@ -1,6 +1,6 @@
 Package: dera.pq
 Title: SEC DERA Data Sets as Local Parquet Files
-Version: 0.0.0.9000
+Version: 0.0.1.9000
 Authors@R:
     person("Ian D.", "Gow", email = "iandgow@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6243-8409"))
