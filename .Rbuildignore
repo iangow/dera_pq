@@ -16,3 +16,15 @@
 ^[.]github$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^[.]venv$
+^pyproject[.]toml$
+^uv[.]lock$
+^[.]python-version$
+^requirements.*[.]txt$
+^.*__pycache__.*$
+^[.]pytest_cache$
+^[.]ruff_cache$
+^[.]mypy_cache$
+^build$
+^dist$
+^.*[.]egg-info$
