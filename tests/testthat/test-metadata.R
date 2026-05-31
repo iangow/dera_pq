@@ -51,6 +51,7 @@ test_that("Arrow writer embeds SEC source metadata", {
 
   expect_equal(pq_metadata$dera_dataset, "dera")
   expect_equal(pq_metadata$dera_source_file, "2024q1.zip")
+  expect_null(pq_metadata$sec_last_modified)
   expect_equal(pq_metadata$last_modified, "Wed, 15 Nov 2023 21:46:14 GMT")
   expect_equal(pq_metadata$last_modified_utc, "2023-11-15T21:46:14Z")
   expect_null(pq_metadata$downloaded_at_utc)

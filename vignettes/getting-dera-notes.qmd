@@ -139,7 +139,6 @@ Typical metadata fields include:
 - `dera_dataset`
 - `dera_source_file`
 - `dera_source_url`
-- `sec_last_modified`
 - `last_modified`
 - `last_modified_utc`
 

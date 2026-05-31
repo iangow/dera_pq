@@ -28,7 +28,6 @@ dera_metadata <- function(dataset, file, source_url, last_modified) {
     dera_dataset = dataset,
     dera_source_file = file,
     dera_source_url = source_url,
-    sec_last_modified = last_modified %||% "",
     last_modified = last_modified %||% "",
     last_modified_utc = http_datetime_iso(last_modified)
   )
