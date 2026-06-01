@@ -2,6 +2,7 @@ url: https://iangow.github.io/dera_pq/
 
 template:
   bootstrap: 5
+  light-switch: true
 
 navbar:
   structure:
